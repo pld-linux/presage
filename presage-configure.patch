@@ -1,0 +1,72 @@
+--- presage-0.9.1/configure.ac.orig	2015-04-21 13:33:16.000000000 +0200
++++ presage-0.9.1/configure.ac	2018-03-24 22:37:45.543196684 +0100
+@@ -267,8 +267,7 @@
+ if test "$PYTHON" != :
+ then
+     AC_MSG_CHECKING(for python dbus module)
+-    $PYTHON -c "import dbus" 2&>/dev/null
+-    if test $? -eq 0;
++    if true;
+     then
+     	have_dbus_python=yes
+     else
+@@ -285,8 +284,7 @@
+ if test "$PYTHON" != :
+ then
+     AC_MSG_CHECKING(for pyatspi module)
+-    $PYTHON -c "import pyatspi" 2&>/dev/null
+-    if test $? -eq 0;
++    if true;
+     then
+     	have_pyatspi=yes
+     else
+@@ -295,8 +293,7 @@
+     AC_MSG_RESULT($have_pyatspi)
+     
+     AC_MSG_CHECKING(for python gtk module)
+-    $PYTHON -c "import gtk" 2&>/dev/null
+-    if test $? -eq 0;
++    if true;
+     then
+     	have_python_gtk=yes
+     else
+@@ -305,8 +302,7 @@
+     AC_MSG_RESULT($have_python_gtk)
+     
+     AC_MSG_CHECKING(for python pango module)
+-    $PYTHON -c "import pango" 2&>/dev/null
+-    if test $? -eq 0;
++    if true;
+     then
+     	have_python_pango=yes
+     else
+@@ -315,8 +311,7 @@
+     AC_MSG_RESULT($have_python_pango)
+     
+     AC_MSG_CHECKING(for python Xlib module)
+-    $PYTHON -c "import Xlib" 2&>/dev/null
+-    if test $? -eq 0;
++    if true;
+     then
+     	have_python_Xlib=yes
+     else
+@@ -344,8 +339,7 @@
+ if test "$PYTHON" != :
+ then
+     AC_MSG_CHECKING(for python wx module)
+-    $PYTHON -c "import wx" 2&>/dev/null
+-    if test $? -eq 0;
++    if true;
+     then
+     	have_python_wx=yes
+     else
+@@ -355,8 +349,7 @@
+     
+     
+     AC_MSG_CHECKING(for python wx.stc module)
+-    $PYTHON -c "import wx.stc" 2&>/dev/null
+-    if test $? -eq 0;
++    if true;
+     then
+     	have_python_wx_stc=yes
+     else

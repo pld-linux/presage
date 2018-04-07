@@ -1,0 +1,23 @@
+--- presage-0.9.1/apps/gtk/gprompter/Makefile.am.orig	2015-04-21 13:31:43.000000000 +0200
++++ presage-0.9.1/apps/gtk/gprompter/Makefile.am	2018-03-04 12:26:44.126679307 +0100
+@@ -238,7 +238,7 @@
+ 				-I$(srcdir)/scintilla/include \
+ 				-I$(srcdir)/scintilla/src \
+ 				-I$(srcdir)/scintilla/lexlib 
+-libscintilla_la_LIBADD = 	$(GNOME_LIBS) $(GTHREAD_LIBS)
++libscintilla_la_LIBADD = 	$(GNOME_LIBS) $(GTHREAD_LIBS) -lm
+ 
+ # Distribute files from here.
+ EXTRA_DIST = scintilla/License.txt scintilla/version.txt
+--- presage-0.9.1/configure.ac.orig	2015-04-21 13:33:16.000000000 +0200
++++ presage-0.9.1/configure.ac	2018-03-24 22:56:26.159850555 +0100
+@@ -89,9 +89,6 @@
+                [test "x$have_ld_with_version_script" = "xyes"])
+ 
+ 
+-dnl Cygwin windows specific flag
+-LDFLAGS="-L/usr/local/lib $LDFLAGS"
+-
+ dnl ====================
+ dnl Checks for libraries
+ dnl ====================
