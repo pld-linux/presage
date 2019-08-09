@@ -5,7 +5,7 @@
  				-I$(srcdir)/scintilla/src \
  				-I$(srcdir)/scintilla/lexlib 
 -libscintilla_la_LIBADD = 	$(GNOME_LIBS) $(GTHREAD_LIBS)
-+libscintilla_la_LIBADD = 	$(GNOME_LIBS) $(GTHREAD_LIBS) -lm
++libscintilla_la_LIBADD = 	$(GNOME_LIBS) $(GTHREAD_LIBS) $(GMODULE_LIBS) -lm
  
  # Distribute files from here.
  EXTRA_DIST = scintilla/License.txt scintilla/version.txt

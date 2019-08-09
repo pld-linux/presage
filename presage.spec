@@ -1,24 +1,26 @@
 #
 # Conditional build:
-%bcond_without	apidocs		# do not build and package API docs
+%bcond_without	apidocs		# API documentation
 %bcond_without	ngram		# ARPA ngram language model
-%bcond_without	static_libs	# don't build static libraries
+%bcond_without	static_libs	# static library
 #
 Summary:	Presage - the intelligent predictive text entry system
 Summary(pl.UTF-8):	Presage - inteligentny, przewidujący system wprowadzania tekstu
 Name:		presage
 Version:	0.9.1
-Release:	0.1
+Release:	1
 License:	GPL v2+
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/presage/%{name}-%{version}.tar.gz
 # Source0-md5:	9667be297912fa0d432e748526d8dd9e
 Patch0:		%{name}-link.patch
 Patch1:		%{name}-configure.patch
+Patch2:		%{name}-build.patch
+Patch3:		%{name}-cmuclmtk.patch
 URL:		http://presage.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake >= 1:1.9
-%{?with_ngram:BuildRequires:	cmuclmtk}
+%{?with_ngram:BuildRequires:	cmuclmtk >= 0.7}
 BuildRequires:	cppunit-devel >= 1.9.6
 %{?with_apidocs:BuildRequires:	doxygen}
 BuildRequires:	graphviz
@@ -29,11 +31,10 @@ BuildRequires:	libstdc++-devel
 BuildRequires:	libtool >= 2:2
 BuildRequires:	ncurses-devel
 BuildRequires:	pkgconfig
-BuildRequires:	python-dbus
 BuildRequires:	python-devel >= 2.0
-BuildRequires:	python-pyatspi
-BuildRequires:	python-pygtk-gtk >= 2:2
-BuildRequires:	python-wx
+BuildRequires:	rpm-pythonprov
+BuildRequires:	rpmbuild(macros) >= 1.714
+BuildRequires:	sed >= 4.0
 BuildRequires:	sqlite3-devel >= 3
 BuildRequires:	swig-python >= 2.0
 BuildRequires:	tinyxml-devel
@@ -111,9 +112,91 @@ API documentation for Presage library.
 %description apidocs -l pl.UTF-8
 Dokumentacja API biblioteki Presage.
 
+%package dbus
+Summary:	Presage DBus service
+Summary(pl.UTF-8):	Usługa DBus presage
+Group:		Applications
+Requires:	%{name} = %{version}-%{release}
+Requires:	python-dbus
+Requires:	python-presage = %{version}-%{release}
+Requires:	python-pygobject >= 2:2
+
+%description dbus
+Presage is an intelligent predictive text entry system. This package
+contains the presage D-Bus service.
+
+%description dbus 
+Presage to inteligentny, przewidujący system wprowadzania tekstu. Ten
+pakiet zawiera usługę D-Bus presage.
+
+%package gtk
+Summary:	GTK+ presage applications
+Summary(pl.UTF-8):	Aplikacje presage oparte na GTK+
+Group:		X11/Applications
+Requires:	%{name} = %{version}-%{release}
+
+%description gtk
+GTK+ presage applications:
+- gpresagemate: user input predictions using XEvIE extension
+- gprompter: intelligent predictive GTK+ text editor
+
+%description gtk -l pl.UTF-8
+Aplikacje presage oparte na GTK+:
+- gpresagemate - przewidywanie wejścia użytkownika z wykorzystaniem
+  rozszerzenia XEvIE
+- gprompter - inteligenty, przewidujący edytor tekstu oparty na GTK+
+
+%package -n python-presage
+Summary:	Python binding for presage
+Summary(pl.UTF-8):	Wiązanie Pythona do presage
+Group:		Libraries/Python
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description -n python-presage
+Python binding for presage, the intelligent predictive text entry
+system.
+
+%description -n python-presage -l pl.UTF-8
+Wiązanie Pythona do presage - inteligentnego, przewidującego systemu
+wprowadzania tekstu.
+
+%package -n python-pypresagemate
+Summary:	Python presagemate widget
+Summary(pl.UTF-8):	Widget presagemate dla Pythona
+Group:		Libraries/Python
+Requires:	python-Xlib
+Requires:	python-presage = %{version}-%{release}
+Requires:	python-pyatspi
+Requires:	python-pygtk-gtk >= 2:2
+Requires:	python-pygtk-pango >= 2:2
+
+%description -n python-pypresagemate
+Python presagemate widget.
+
+%description -n python-pypresagemate -l pl.UTF-8
+Widget presagemate dla Pythona.
+
+%package -n python-pyprompter
+Summary:	pyprompter - intelligent predictive wxPython text editor
+Summary(pl.UTF-8):	pyprompter - inteligentny, przewidujący edytor tekstu wykorzystujący bibliotekę wxPython
+Group:		Libraries/Python
+Requires:	python-wxPython
+
+%description -n python-pyprompter
+pyprompter is an intelligent predictive wxPython text editor.
+
+%description -n python-pyprompter -l pl.UTF-8
+pyprompter to inteligentny, przewidujący edytor tekstu wykorzystujący
+bibliotekę wxPython.
+
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+
+%{__sed} -i -e '1s,/usr/bin/env python,%{__python},' apps/dbus/{presage_dbus_python_demo,presage_dbus_service,presage_dbus_service.py}
 
 %build
 %{__libtoolize}
@@ -132,7 +215,15 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+%py_comp $RPM_BUILD_ROOT%{py_sitedir}
+%py_ocomp $RPM_BUILD_ROOT%{py_sitedir}
 %py_postclean
+
+# not used
+%{__rm} $RPM_BUILD_ROOT%{_datadir}/%{name}/presage.{svg,xpm}
+# packaged as %doc
+%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/%{name}/html
+%{__rm} $RPM_BUILD_ROOT%{_datadir}/%{name}/{getting_started,python_binding}.txt
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -143,22 +234,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog FAQ NEWS README THANKS TODO doc/getting_started.txt
-%attr(755,root,root) %{_libdir}/libpresage.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libpresage.so.1
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/presage.xml
-
-%attr(755,root,root) %{_bindir}/gpresagemate
-
-%attr(755,root,root) %{_bindir}/gprompter
-
-# dbus service, R: python-dbus
-%attr(755,root,root) %{_bindir}/presage_dbus_python_demo
-%attr(755,root,root) %{_bindir}/presage_dbus_service
-%{py_sitescriptdir}/presage_dbus_service.py[co]
-%{_datadir}/dbus-1/services/org.gnome.presage.service
-%{_mandir}/man1/presage_dbus_python_demo.1*
-%{_mandir}/man1/presage_dbus_service.1*
-
 %attr(755,root,root) %{_bindir}/presage_demo
 %attr(755,root,root) %{_bindir}/presage_demo_text
 %attr(755,root,root) %{_bindir}/presage_python_demo
@@ -166,41 +242,24 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/text2ngram
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/abbreviations_*.txt
-%{_datadir}/%{name}/database_*.db
 %if %{with ngram}
-%{_datadir}/%{name}/vocab*
+%{_datadir}/%{name}/arpa_en.arpa
+%{_datadir}/%{name}/arpa_en.vocab
+%{_datadir}/%{name}/arpa_it.arpa
+%{_datadir}/%{name}/arpa_it.vocab
 %endif
-# FIXME: location
-%doc %{_datadir}/%{name}/html
-%{_desktopdir}/gprompter.desktop
-%{_iconsdir}/hicolor/scalable/apps/gprompter.svg
-%{_pixmapsdir}/gprompter.png
-%{_pixmapsdir}/gprompter.xpm
-%{_mandir}/man1/gprompter.1*
+%{_datadir}/%{name}/database_*.db
+%{_datadir}/%{name}/presage.png
 %{_mandir}/man1/presage_demo.1*
 %{_mandir}/man1/presage_demo_text.1*
 %{_mandir}/man1/presage_python_demo.1*
 %{_mandir}/man1/presage_simulator.1*
 %{_mandir}/man1/text2ngram.1*
 
-%attr(755,root,root) %{py_sitedir}/_presage.so
-%attr(755,root,root) %{py_sitedir}/presage.py[co]
-%{py_sitedir}/python_presage-%{version}-py*.egg-info
-
-# pyprompter, R: python-wxPython
-# FIXME: *.pyo
-%attr(755,root,root) %{_bindir}/pyprompter
-%{py_sitedir}/prompter
-%{py_sitedir}/pyprompter-%{version}-py*.egg-info
-%{_desktopdir}/pyprompter.desktop
-%{_iconsdir}/hicolor/scalable/apps/pyprompter.svg
-%{_pixmapsdir}/pyprompter.png
-%{_pixmapsdir}/pyprompter.xpm
-%{_mandir}/man1/pyprompter.1*
-
-# pypresagemate, R: python-pyatspi, python-pygtk-gtk, python-pygtk-pango, python-Xlib
-%attr(755,root,root) %{_bindir}/pypresagemate
-%{py_sitescriptdir}/presagemate
+%files libs
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libpresage.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libpresage.so.1
 
 %files devel
 %defattr(644,root,root,755)
@@ -217,12 +276,48 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with apidocs}
 %files apidocs
 %defattr(644,root,root,755)
-%doc doc/html/*
+%doc doc/html/*.{css,html,js,png}
 %endif
 
-#%doc doc/python_binding.txt
+%files dbus
+%defattr(644,root,root,755)
+# dbus service, R: python-dbus
+%attr(755,root,root) %{_bindir}/presage_dbus_python_demo
+%attr(755,root,root) %{_bindir}/presage_dbus_service
+%{py_sitescriptdir}/presage_dbus_service.py[co]
+%{_datadir}/dbus-1/services/org.gnome.presage.service
+%{_mandir}/man1/presage_dbus_python_demo.1*
+%{_mandir}/man1/presage_dbus_service.1*
 
-# TODO:
-#%{_datadir}/presage/presage.png
-#%{_datadir}/presage/presage.svg
-#%{_datadir}/presage/presage.xpm
+%files gtk
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/gpresagemate
+%attr(755,root,root) %{_bindir}/gprompter
+%{_desktopdir}/gprompter.desktop
+%{_iconsdir}/hicolor/scalable/apps/gprompter.svg
+%{_pixmapsdir}/gprompter.png
+%{_pixmapsdir}/gprompter.xpm
+%{_mandir}/man1/gprompter.1*
+
+%files -n python-presage
+%defattr(644,root,root,755)
+%doc doc/python_binding.txt
+%attr(755,root,root) %{py_sitedir}/_presage.so
+%{py_sitedir}/presage.py[co]
+%{py_sitedir}/python_presage-%{version}-py*.egg-info
+
+%files -n python-pypresagemate
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/pypresagemate
+%{py_sitescriptdir}/presagemate
+
+%files -n python-pyprompter
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/pyprompter
+%{py_sitedir}/prompter
+%{py_sitedir}/pyprompter-%{version}-py*.egg-info
+%{_desktopdir}/pyprompter.desktop
+%{_iconsdir}/hicolor/scalable/apps/pyprompter.svg
+%{_pixmapsdir}/pyprompter.png
+%{_pixmapsdir}/pyprompter.xpm
+%{_mandir}/man1/pyprompter.1*
