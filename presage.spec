@@ -8,7 +8,7 @@ Summary:	Presage - the intelligent predictive text entry system
 Summary(pl.UTF-8):	Presage - inteligentny, przewidujący system wprowadzania tekstu
 Name:		presage
 Version:	0.9.1
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/presage/%{name}-%{version}.tar.gz
@@ -119,7 +119,7 @@ Group:		Applications
 Requires:	%{name} = %{version}-%{release}
 Requires:	python-dbus
 Requires:	python-presage = %{version}-%{release}
-Requires:	python-pygobject >= 2:2
+Requires:	python-pygobject >= 2.28
 
 %description dbus
 Presage is an intelligent predictive text entry system. This package
