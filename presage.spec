@@ -32,6 +32,7 @@ BuildRequires:	libtool >= 2:2
 BuildRequires:	ncurses-devel
 BuildRequires:	pkgconfig
 BuildRequires:	python-devel >= 2.0
+BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
 BuildRequires:	sed >= 4.0
