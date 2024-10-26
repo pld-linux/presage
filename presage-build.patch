@@ -135,3 +135,14 @@
  
      '\0' };
  
+--- presage-0.9.1/apps/gtk/gprompter/scintilla/gtk/ScintillaGTK.cxx.orig	2015-04-21 13:31:43.000000000 +0200
++++ presage-0.9.1/apps/gtk/gprompter/scintilla/gtk/ScintillaGTK.cxx	2024-10-26 14:38:10.956803818 +0200
+@@ -1626,7 +1626,7 @@ void ScintillaGTK::ReceivedDrop(GtkSelec
+ 		drop.push_back('\0');
+ 		NotifyURIDropped(&drop[0]);
+ 	} else if ((TypeOfGSD(selection_data) == GDK_TARGET_STRING) || (TypeOfGSD(selection_data) == atomUTF8)) {
+-		if (TypeOfGSD(selection_data) > 0) {
++		if (LengthOfGSD(selection_data) > 0) {
+ 			SelectionText selText;
+ 			GetGtkSelectionText(selection_data, selText);
+ 			DropAt(posDrop, selText.Data(), selText.Length(), false, selText.rectangular);

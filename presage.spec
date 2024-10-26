@@ -3,12 +3,13 @@
 %bcond_without	apidocs		# API documentation
 %bcond_without	ngram		# ARPA ngram language model
 %bcond_without	static_libs	# static library
+%bcond_with	xevie		# Xevie based gpresagemate app
 #
 Summary:	Presage - the intelligent predictive text entry system
 Summary(pl.UTF-8):	Presage - inteligentny, przewidujący system wprowadzania tekstu
 Name:		presage
 Version:	0.9.1
-Release:	2
+Release:	3
 License:	GPL v2+
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/presage/%{name}-%{version}.tar.gz
@@ -17,6 +18,8 @@ Patch0:		%{name}-link.patch
 Patch1:		%{name}-configure.patch
 Patch2:		%{name}-build.patch
 Patch3:		%{name}-cmuclmtk.patch
+Patch4:		%{name}-c++17.patch
+Patch5:		%{name}-format.patch
 URL:		http://presage.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake >= 1:1.9
@@ -40,7 +43,7 @@ BuildRequires:	sqlite3-devel >= 3
 BuildRequires:	swig-python >= 2.0
 BuildRequires:	tinyxml-devel
 BuildRequires:	xorg-lib-libX11-devel
-BuildRequires:	xorg-lib-libXevie-devel
+%{?with_xevie:BuildRequires:	xorg-lib-libXevie-devel}
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -136,13 +139,17 @@ Requires:	%{name} = %{version}-%{release}
 
 %description gtk
 GTK+ presage applications:
+%if %{with xevie}
 - gpresagemate: user input predictions using XEvIE extension
+%endif
 - gprompter: intelligent predictive GTK+ text editor
 
 %description gtk -l pl.UTF-8
 Aplikacje presage oparte na GTK+:
+%if %{with xevie}
 - gpresagemate - przewidywanie wejścia użytkownika z wykorzystaniem
   rozszerzenia XEvIE
+%endif
 - gprompter - inteligenty, przewidujący edytor tekstu oparty na GTK+
 
 %package -n python-presage
@@ -194,8 +201,13 @@ bibliotekę wxPython.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
-%{__sed} -i -e '1s,/usr/bin/env python,%{__python},' apps/dbus/{presage_dbus_python_demo,presage_dbus_service,presage_dbus_service.py}
+%{__sed} -i -e '1s,/usr/bin/env python,%{__python},' \
+	apps/dbus/{presage_dbus_python_demo.in,presage_dbus_service,presage_dbus_service.py}
+%{__sed} -i -e '1s,/usr/bin/python$,%{__python},' \
+	apps/python/pypresagemate.in
 
 %build
 %{__libtoolize}
@@ -204,7 +216,9 @@ bibliotekę wxPython.
 %{__autoheader}
 %{__automake}
 %configure \
+	PYTHON=%{__python} \
 	%{!?with_apidocs:--disable-documentation} \
+	%{!?with_xevie:--disable-gpresagemate} \
 	%{!?with_static_libs:--disable-static}
 %{__make}
 
@@ -290,7 +304,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files gtk
 %defattr(644,root,root,755)
+%if %{with xevie}
 %attr(755,root,root) %{_bindir}/gpresagemate
+%endif
 %attr(755,root,root) %{_bindir}/gprompter
 %{_desktopdir}/gprompter.desktop
 %{_iconsdir}/hicolor/scalable/apps/gprompter.svg
