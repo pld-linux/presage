@@ -34,6 +34,8 @@ BuildRequires:	libstdc++-devel
 BuildRequires:	libtool >= 2:2
 BuildRequires:	ncurses-devel
 BuildRequires:	pkgconfig
+# for help2man generating man pages
+BuildRequires:	python-dbus
 BuildRequires:	python-devel >= 2.0
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpm-pythonprov
