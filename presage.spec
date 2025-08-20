@@ -9,7 +9,7 @@ Summary:	Presage - the intelligent predictive text entry system
 Summary(pl.UTF-8):	Presage - inteligentny, przewidujący system wprowadzania tekstu
 Name:		presage
 Version:	0.9.1
-Release:	3
+Release:	4
 License:	GPL v2+
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/presage/%{name}-%{version}.tar.gz
