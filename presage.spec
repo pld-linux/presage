@@ -129,7 +129,7 @@ Requires:	python-pygobject >= 2.28
 Presage is an intelligent predictive text entry system. This package
 contains the presage D-Bus service.
 
-%description dbus 
+%description dbus -l pl.UTF-8
 Presage to inteligentny, przewidujący system wprowadzania tekstu. Ten
 pakiet zawiera usługę D-Bus presage.
 
